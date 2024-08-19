@@ -1,0 +1,2 @@
+ALTER TABLE veiculos
+ADD COLUMN valor TEXT;
