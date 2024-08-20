@@ -3,6 +3,7 @@ package com.estacionamento.services;
 import com.estacionamento.DTO.VeiculoDto;
 import com.estacionamento.DTO.VeiculoSaidaDto;
 import com.estacionamento.domain.Veiculo;
+import com.estacionamento.domain.VeiculoTipo;
 import com.estacionamento.mapper.VeiculoMapper;
 import com.estacionamento.mapper.VeiculoSaidaMapper;
 import com.estacionamento.repositories.VeiculoRepository;
@@ -52,7 +53,7 @@ public class VeiculoService {
         veiculo.setSaida(LocalDateTime.now());
 
         Long periodo = calcularPeriodoEmMinuto(veiculo.getEntrada(), veiculo.getSaida());
-        String calculoValor = calcularValor(veiculo.getEntrada(), veiculo.getSaida());
+        String calculoValor = calcularValor(veiculo.getEntrada(), veiculo.getSaida(), String.valueOf(veiculo.getTipoVeiculo()));
 
         veiculo.setValor(calculoValor);
         veiculo.setPeriodoEmMinutos(periodo);
@@ -62,19 +63,39 @@ public class VeiculoService {
         return VeiculoSaidaMapper.toDto(veiculo);
     }
 
-    public String calcularValor(LocalDateTime entrada, LocalDateTime saida){
+    public String calcularValor(LocalDateTime entrada, LocalDateTime saida, String tipoVeiculo){
         Long periodoEmMinutos = calcularPeriodoEmMinuto(entrada, saida);
 
-        if(periodoEmMinutos <= 120){
-            return "R$10,00";
+        Integer valorAte120Min;
+        Integer valorAte240Min;
+        Integer valor30Min;
+
+        if(tipoVeiculo.equalsIgnoreCase("carro")){
+            valorAte120Min = 10;
+            valorAte240Min = 20;
+            valor30Min = 5;
+        } else if(tipoVeiculo.equalsIgnoreCase("moto")){
+            valorAte120Min = 5;
+            valorAte240Min = 10;
+            valor30Min = 3;
+        } else {
+            return "Tipo de veículo inválido.";
         }
 
-        if(periodoEmMinutos > 120 && periodoEmMinutos <= 240){
-            return "R$20,00";
+        if (periodoEmMinutos <= 120) {
+            return "R$" + valorAte120Min + ",00";
         }
 
-        if(periodoEmMinutos > 240){
-            return "R$30,00";
+        if (periodoEmMinutos > 120 && periodoEmMinutos <= 240) {
+            return "R$" + valorAte240Min + ",00";
+        }
+
+        if (periodoEmMinutos > 240) {
+            Long minutosExcedentes = periodoEmMinutos - 240;
+            int intervalosAdicionais = (int) Math.ceil(minutosExcedentes / 30.0);
+            Integer valorFinal = valorAte240Min + (intervalosAdicionais * valor30Min);
+
+            return "R$" + valorFinal + ",00";
         }
 
         return null;
