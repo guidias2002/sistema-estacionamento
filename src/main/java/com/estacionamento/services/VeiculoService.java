@@ -3,6 +3,8 @@ package com.estacionamento.services;
 import com.estacionamento.DTO.VeiculoDto;
 import com.estacionamento.DTO.VeiculoSaidaDto;
 import com.estacionamento.domain.Veiculo;
+import com.estacionamento.mapper.VeiculoMapper;
+import com.estacionamento.mapper.VeiculoSaidaMapper;
 import com.estacionamento.repositories.VeiculoRepository;
 import org.springframework.stereotype.Service;
 
@@ -14,9 +16,13 @@ import java.util.List;
 public class VeiculoService {
 
     private final VeiculoRepository veiculoRepository;
+    private final VeiculoMapper veiculoMapper;
+    private final VeiculoSaidaMapper veiculoSaidaMapper;
 
-    public VeiculoService(VeiculoRepository veiculoRepository) {
+    public VeiculoService(VeiculoRepository veiculoRepository, VeiculoMapper veiculoMapper, VeiculoSaidaMapper veiculoSaidaMapper) {
         this.veiculoRepository = veiculoRepository;
+        this.veiculoMapper = veiculoMapper;
+        this.veiculoSaidaMapper = veiculoSaidaMapper;
     }
 
     public Veiculo registrarVeiculo(VeiculoDto veiculo){
@@ -27,13 +33,19 @@ public class VeiculoService {
         return newVeiculo;
     }
 
-    public List<VeiculoDto> listarVeiculos(){
+    public List<VeiculoDto> listarTodosOsVeiculos(){
         return this.veiculoRepository.findAll().stream()
-                .map((veiculo) -> new VeiculoDto(veiculo.getId(), veiculo.getTipoVeiculo(), veiculo.getPlaca(), veiculo.getModelo(), veiculo.getCor(), veiculo.getEntrada(), veiculo.getSaida(), veiculo.getPeriodoEmMinutos(),veiculo.getValor()))
+                .map(VeiculoMapper::toDto)
                 .toList();
     }
 
-    public VeiculoSaidaDto saidaVeiculo(String placa){
+    public List<VeiculoDto> listarVeiculosEstacionados(){
+        return this.veiculoRepository.findBySaidaNull().stream()
+                .map(VeiculoMapper::toDto)
+                .toList();
+    }
+
+    public VeiculoSaidaDto registrarSaidaVeiculo(String placa){
         Veiculo veiculo = this.veiculoRepository.findVeiculoByPlaca(placa)
                 .orElseThrow(() -> new RuntimeException("Nenhum veículo encontrado com essa placa."));
 
@@ -47,7 +59,7 @@ public class VeiculoService {
 
         this.veiculoRepository.save(veiculo);
 
-        return new VeiculoSaidaDto(veiculo.getTipoVeiculo(), veiculo.getPlaca(), veiculo.getModelo(), veiculo.getEntrada(), veiculo.getSaida(), veiculo.getPeriodoEmMinutos(), veiculo.getValor());
+        return VeiculoSaidaMapper.toDto(veiculo);
     }
 
     public String calcularValor(LocalDateTime entrada, LocalDateTime saida){
@@ -57,8 +69,12 @@ public class VeiculoService {
             return "R$10,00";
         }
 
-        if(periodoEmMinutos > 120 && periodoEmMinutos < 240){
+        if(periodoEmMinutos > 120 && periodoEmMinutos <= 240){
             return "R$20,00";
+        }
+
+        if(periodoEmMinutos > 240){
+            return "R$30,00";
         }
 
         return null;
