@@ -28,15 +28,22 @@ public class VeiculoController {
     }
 
     @GetMapping
-    public ResponseEntity<List<VeiculoDto>> listarVeiculos() {
-        List<VeiculoDto> veiculos = this.veiculoService.listarVeiculos();
+    public ResponseEntity<List<VeiculoDto>> listarTodosOsVeiculos() {
+        List<VeiculoDto> veiculos = this.veiculoService.listarTodosOsVeiculos();
+
+        return ResponseEntity.ok(veiculos);
+    }
+
+    @GetMapping("/estacionados")
+    public ResponseEntity<List<VeiculoDto>> listarVeiculosEstacionados() {
+        List<VeiculoDto> veiculos = this.veiculoService.listarVeiculosEstacionados();
 
         return ResponseEntity.ok(veiculos);
     }
 
     @PostMapping("/saida/{placa}")
-    public ResponseEntity<VeiculoSaidaDto> saidaVeiculo(@PathVariable String placa){
-        VeiculoSaidaDto dadosVeiculo = this.veiculoService.saidaVeiculo(placa);
+    public ResponseEntity<VeiculoSaidaDto> registrarSaidaVeiculo(@PathVariable String placa){
+        VeiculoSaidaDto dadosVeiculo = this.veiculoService.registrarSaidaVeiculo(placa);
 
         return ResponseEntity.ok(dadosVeiculo);
     }
