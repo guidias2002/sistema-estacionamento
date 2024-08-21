@@ -9,6 +9,8 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface VeiculoRepository extends JpaRepository<Veiculo, UUID> {
-    Optional<Veiculo> findVeiculoByPlaca(String placa);
+    Optional<Veiculo> findByPlacaAndSaidaIsNull(String placa);
+    Optional<Veiculo> findVeiculoById(UUID id);
     List<Veiculo> findBySaidaNull();
+    List<Veiculo> findVeiculoByPlaca(String placa);
 }
