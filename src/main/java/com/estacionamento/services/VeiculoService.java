@@ -3,7 +3,8 @@ package com.estacionamento.services;
 import com.estacionamento.DTO.VeiculoDto;
 import com.estacionamento.DTO.VeiculoSaidaDto;
 import com.estacionamento.domain.Veiculo;
-import com.estacionamento.infra.exceptions.VeiculoNotFoundException;
+import com.estacionamento.infra.exceptions.VehicleIsParkedException;
+import com.estacionamento.infra.exceptions.VehicleNotFoundException;
 import com.estacionamento.mapper.VeiculoMapper;
 import com.estacionamento.mapper.VeiculoSaidaMapper;
 import com.estacionamento.repositories.VeiculoRepository;
@@ -13,7 +14,6 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 @Service
 public class VeiculoService {
@@ -36,7 +36,7 @@ public class VeiculoService {
             Veiculo veiculoJaCadastrado = veiculoJaCadastradoOpt.get();
 
             if(veiculoJaCadastrado.getSaida() == null){
-                throw new RuntimeException("Veículo com a placa " + veiculoJaCadastrado.getPlaca() + " já está estacionado");
+                throw new VehicleIsParkedException("Veículo com a placa " + veiculoJaCadastrado.getPlaca() + " já está estacionado");
             }
         }
 
@@ -59,7 +59,7 @@ public class VeiculoService {
 
     public VeiculoSaidaDto registrarSaidaVeiculo(String placa){
         Veiculo veiculo = this.veiculoRepository.findByPlacaAndSaidaIsNull(placa)
-                .orElseThrow(() -> new VeiculoNotFoundException());
+                .orElseThrow(() -> new VehicleNotFoundException());
 
         veiculo.setSaida(LocalDateTime.now());
 
@@ -126,7 +126,7 @@ public class VeiculoService {
                 .toList();
 
         if(registrosVeiculos.isEmpty()){
-            throw new VeiculoNotFoundException("Nenhum veículo encontrado com a placa " + placa);
+            throw new VehicleNotFoundException("Nenhum veículo encontrado com a placa " + placa);
         }
 
         return registrosVeiculos;
