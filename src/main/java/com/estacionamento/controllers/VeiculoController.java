@@ -49,8 +49,7 @@ public class VeiculoController {
         return ResponseEntity.ok(dadosVeiculo);
     }
 
-    @GetMapping("/" +
-            "/{placa}")
+    @GetMapping("/registros-por-veiculo/{placa}")
     public ResponseEntity<List<VeiculoDto>> listarRegistrosDeUmVeiculo(@PathVariable String placa){
         List<VeiculoDto> veiculoRegistros = this.veiculoService.listarRegistrosDeUmVeiculo(placa);
 
