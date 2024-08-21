@@ -12,6 +12,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class VeiculoService {
@@ -28,7 +29,7 @@ public class VeiculoService {
 
     public Veiculo registrarVeiculo(VeiculoDto veiculo){
         Veiculo newVeiculo = new Veiculo(veiculo);
-        Optional<Veiculo> veiculoJaCadastradoOpt = this.veiculoRepository.findVeiculoByPlaca(newVeiculo.getPlaca());
+        Optional<Veiculo> veiculoJaCadastradoOpt = this.veiculoRepository.findByPlacaAndSaidaIsNull(newVeiculo.getPlaca());
 
         if(veiculoJaCadastradoOpt.isPresent()){
             Veiculo veiculoJaCadastrado = veiculoJaCadastradoOpt.get();
@@ -56,7 +57,7 @@ public class VeiculoService {
     }
 
     public VeiculoSaidaDto registrarSaidaVeiculo(String placa){
-        Veiculo veiculo = this.veiculoRepository.findVeiculoByPlaca(placa)
+        Veiculo veiculo = this.veiculoRepository.findByPlacaAndSaidaIsNull(placa)
                 .orElseThrow(() -> new RuntimeException("Nenhum veículo encontrado com essa placa."));
 
         veiculo.setSaida(LocalDateTime.now());
@@ -117,4 +118,28 @@ public class VeiculoService {
 
         return periodoEmMinutos;
     }
+
+    public List<VeiculoDto> listarRegistrosDeUmVeiculo(String placa){
+        return this.veiculoRepository.findVeiculoByPlaca(placa).stream()
+                .map(VeiculoMapper::toDto)
+                .toList();
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }

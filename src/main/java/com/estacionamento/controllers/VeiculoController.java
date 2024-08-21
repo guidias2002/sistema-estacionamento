@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/veiculos")
@@ -42,9 +43,17 @@ public class VeiculoController {
     }
 
     @PostMapping("/saida/{placa}")
-    public ResponseEntity<VeiculoSaidaDto> registrarSaidaVeiculo(@PathVariable String placa){
+    public ResponseEntity<VeiculoSaidaDto> registrarSaidaVeiculo(@PathVariable String placa) {
         VeiculoSaidaDto dadosVeiculo = this.veiculoService.registrarSaidaVeiculo(placa);
 
         return ResponseEntity.ok(dadosVeiculo);
+    }
+
+    @GetMapping("/" +
+            "/{placa}")
+    public ResponseEntity<List<VeiculoDto>> listarRegistrosDeUmVeiculo(@PathVariable String placa){
+        List<VeiculoDto> veiculoRegistros = this.veiculoService.listarRegistrosDeUmVeiculo(placa);
+
+        return ResponseEntity.ok(veiculoRegistros);
     }
 }
