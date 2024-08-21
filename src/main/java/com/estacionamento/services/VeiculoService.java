@@ -3,6 +3,7 @@ package com.estacionamento.services;
 import com.estacionamento.DTO.VeiculoDto;
 import com.estacionamento.DTO.VeiculoSaidaDto;
 import com.estacionamento.domain.Veiculo;
+import com.estacionamento.infra.exceptions.VeiculoNotFoundException;
 import com.estacionamento.mapper.VeiculoMapper;
 import com.estacionamento.mapper.VeiculoSaidaMapper;
 import com.estacionamento.repositories.VeiculoRepository;
@@ -58,7 +59,7 @@ public class VeiculoService {
 
     public VeiculoSaidaDto registrarSaidaVeiculo(String placa){
         Veiculo veiculo = this.veiculoRepository.findByPlacaAndSaidaIsNull(placa)
-                .orElseThrow(() -> new RuntimeException("Nenhum veículo encontrado com essa placa."));
+                .orElseThrow(() -> new VeiculoNotFoundException());
 
         veiculo.setSaida(LocalDateTime.now());
 
@@ -120,9 +121,15 @@ public class VeiculoService {
     }
 
     public List<VeiculoDto> listarRegistrosDeUmVeiculo(String placa){
-        return this.veiculoRepository.findVeiculoByPlaca(placa).stream()
+        List<VeiculoDto> registrosVeiculos = this.veiculoRepository.findVeiculoByPlaca(placa).stream()
                 .map(VeiculoMapper::toDto)
                 .toList();
+
+        if(registrosVeiculos.isEmpty()){
+            throw new VeiculoNotFoundException("Nenhum veículo encontrado com a placa " + placa);
+        }
+
+        return registrosVeiculos;
     }
 
 
