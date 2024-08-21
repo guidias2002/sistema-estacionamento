@@ -3,7 +3,6 @@ package com.estacionamento.services;
 import com.estacionamento.DTO.VeiculoDto;
 import com.estacionamento.DTO.VeiculoSaidaDto;
 import com.estacionamento.domain.Veiculo;
-import com.estacionamento.domain.VeiculoTipo;
 import com.estacionamento.mapper.VeiculoMapper;
 import com.estacionamento.mapper.VeiculoSaidaMapper;
 import com.estacionamento.repositories.VeiculoRepository;
@@ -12,6 +11,7 @@ import org.springframework.stereotype.Service;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class VeiculoService {
@@ -28,6 +28,15 @@ public class VeiculoService {
 
     public Veiculo registrarVeiculo(VeiculoDto veiculo){
         Veiculo newVeiculo = new Veiculo(veiculo);
+        Optional<Veiculo> veiculoJaCadastradoOpt = this.veiculoRepository.findVeiculoByPlaca(newVeiculo.getPlaca());
+
+        if(veiculoJaCadastradoOpt.isPresent()){
+            Veiculo veiculoJaCadastrado = veiculoJaCadastradoOpt.get();
+
+            if(veiculoJaCadastrado.getSaida() == null){
+                throw new RuntimeException("Veículo com a placa " + veiculoJaCadastrado.getPlaca() + " já está estacionado");
+            }
+        }
 
         this.veiculoRepository.save(newVeiculo);
 
