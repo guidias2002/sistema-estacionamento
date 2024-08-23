@@ -7,6 +7,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 
 public record VeiculoDto (
@@ -23,6 +24,6 @@ public record VeiculoDto (
         String cor,
         LocalDateTime entrada,
         LocalDateTime saida,
-        Long periodoEmMinutos,
+        Integer periodoEmMinutos,
         String valor) {
 }

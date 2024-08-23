@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 
 @Entity
@@ -44,7 +45,7 @@ public class Veiculo {
     private LocalDateTime saida;
 
     @Column(name = "periodoemminutos")
-    private Long periodoEmMinutos;
+    private Integer periodoEmMinutos;
 
     private String valor;
 

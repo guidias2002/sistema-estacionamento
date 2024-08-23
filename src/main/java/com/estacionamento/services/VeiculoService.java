@@ -11,9 +11,9 @@ import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 @Service
 public class VeiculoService {
@@ -48,12 +48,14 @@ public class VeiculoService {
     public List<VeiculoDto> listarTodosOsVeiculos(){
         return this.veiculoRepository.findAll().stream()
                 .map(VeiculoMapper::toDto)
+                .sorted(Comparator.comparing(VeiculoDto::saida, Comparator.nullsFirst(Comparator.naturalOrder())))
                 .toList();
     }
 
     public List<VeiculoDto> listarVeiculosEstacionados(){
         return this.veiculoRepository.findBySaidaNull().stream()
                 .map(VeiculoMapper::toDto)
+                .sorted(Comparator.comparing(VeiculoDto::entrada).reversed())
                 .toList();
     }
 
@@ -63,7 +65,7 @@ public class VeiculoService {
 
         veiculo.setSaida(LocalDateTime.now());
 
-        Long periodo = calcularPeriodoEmMinuto(veiculo.getEntrada(), veiculo.getSaida());
+        Integer periodo = calcularPeriodoEmMinuto(veiculo.getEntrada(), veiculo.getSaida());
         String calculoValor = calcularValor(veiculo.getEntrada(), veiculo.getSaida(), String.valueOf(veiculo.getTipoVeiculo()));
 
         veiculo.setValor(calculoValor);
@@ -75,7 +77,7 @@ public class VeiculoService {
     }
 
     public String calcularValor(LocalDateTime entrada, LocalDateTime saida, String tipoVeiculo){
-        Long periodoEmMinutos = calcularPeriodoEmMinuto(entrada, saida);
+        Integer periodoEmMinutos = calcularPeriodoEmMinuto(entrada, saida);
 
         Integer valorAte120Min;
         Integer valorAte240Min;
@@ -102,7 +104,7 @@ public class VeiculoService {
         }
 
         if (periodoEmMinutos > 240) {
-            Long minutosExcedentes = periodoEmMinutos - 240;
+            Integer minutosExcedentes = periodoEmMinutos - 240;
             int intervalosAdicionais = (int) Math.ceil(minutosExcedentes / 30.0);
             Integer valorFinal = valorAte240Min + (intervalosAdicionais * valor30Min);
 
@@ -112,10 +114,10 @@ public class VeiculoService {
         return null;
     }
 
-    public Long calcularPeriodoEmMinuto(LocalDateTime entrada, LocalDateTime saida){
+    public Integer calcularPeriodoEmMinuto(LocalDateTime entrada, LocalDateTime saida){
         Duration periodo = Duration.between(entrada, saida);
 
-        Long periodoEmMinutos = periodo.toMinutes();
+        Integer periodoEmMinutos = Math.toIntExact(periodo.toMinutes());
 
         return periodoEmMinutos;
     }
