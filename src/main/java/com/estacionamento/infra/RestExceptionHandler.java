@@ -1,9 +1,9 @@
 package com.estacionamento.infra;
 
-import com.estacionamento.DTO.VeiculoDto;
 import com.estacionamento.infra.exceptions.TaskErrorMessage;
 import com.estacionamento.infra.exceptions.TaskErrorMessageNotFound;
-import com.estacionamento.infra.exceptions.VeiculoNotFoundException;
+import com.estacionamento.infra.exceptions.VehicleIsParkedException;
+import com.estacionamento.infra.exceptions.VehicleNotFoundException;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -56,10 +56,17 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(taskErrorMessage, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(VeiculoNotFoundException.class)
-    public ResponseEntity<TaskErrorMessageNotFound> handleVeiculoNotFoundException(VeiculoNotFoundException ex){
+    @ExceptionHandler(VehicleNotFoundException.class)
+    public ResponseEntity<TaskErrorMessageNotFound> handleVehicleNotFoundException(VehicleNotFoundException ex){
         TaskErrorMessageNotFound taskErrorMessageNotFound = new TaskErrorMessageNotFound(HttpStatus.NOT_FOUND, ex.getMessage());
 
         return new ResponseEntity<>(taskErrorMessageNotFound, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(VehicleIsParkedException.class)
+    public ResponseEntity<TaskErrorMessageNotFound> handleVehicleIsParkedException(VehicleIsParkedException ex){
+        TaskErrorMessageNotFound taskErrorMessageNotFound = new TaskErrorMessageNotFound(HttpStatus.CONFLICT, ex.getMessage());
+
+        return new ResponseEntity<>(taskErrorMessageNotFound, HttpStatus.CONFLICT);
     }
 }
