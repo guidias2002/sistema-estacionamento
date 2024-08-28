@@ -37,6 +37,7 @@ public class Veiculo {
     @NotBlank(message = "modelo is required")
     private String modelo;
 
+
     @NotBlank(message = "cor is required")
     private String cor;
 
