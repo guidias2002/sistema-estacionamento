@@ -2,11 +2,13 @@ package com.estacionamento.services;
 
 import com.estacionamento.DTO.VeiculoDto;
 import com.estacionamento.DTO.VeiculoSaidaDto;
+import com.estacionamento.DTO.VeiculoUpdateDto;
 import com.estacionamento.domain.Veiculo;
 import com.estacionamento.infra.exceptions.VehicleIsParkedException;
 import com.estacionamento.infra.exceptions.VehicleNotFoundException;
 import com.estacionamento.mapper.VeiculoMapper;
 import com.estacionamento.mapper.VeiculoSaidaMapper;
+import com.estacionamento.mapper.VeiculoUpdateMapper;
 import com.estacionamento.repositories.VeiculoRepository;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +17,7 @@ import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class VeiculoService {
@@ -75,6 +78,42 @@ public class VeiculoService {
         this.veiculoRepository.save(veiculo);
 
         return VeiculoSaidaMapper.toDto(veiculo);
+    }
+
+    public void excluirVeiculo(UUID id){
+        Veiculo veiculo = this.veiculoRepository.findVeiculoById(id)
+                .orElseThrow(() -> new VehicleNotFoundException());
+
+        this.veiculoRepository.deleteById(id);
+    }
+
+    public VeiculoDto atualizarVeiculo(UUID id, VeiculoUpdateDto veiculoUpt){
+        Veiculo veiculo = this.veiculoRepository.findVeiculoById(id)
+                .orElseThrow(() -> new VehicleNotFoundException());
+
+        if(veiculo.getSaida() == null){
+
+            if(veiculoUpt.tipoveiculo() != null){
+                veiculo.setTipoVeiculo(veiculoUpt.tipoveiculo());
+            }
+
+            if(veiculoUpt.placa() != null){
+                veiculo.setPlaca(veiculoUpt.placa());
+            }
+
+            if(veiculoUpt.modelo() != null){
+                veiculo.setModelo(veiculoUpt.modelo());
+            }
+
+            if(veiculoUpt.cor() != null){
+                veiculo.setCor(veiculoUpt.cor());
+            }
+
+            this.veiculoRepository.save(veiculo);
+        }
+
+
+        return VeiculoMapper.toDto(veiculo);
     }
 
     public String calcularValor(LocalDateTime entrada, LocalDateTime saida, String tipoVeiculo){

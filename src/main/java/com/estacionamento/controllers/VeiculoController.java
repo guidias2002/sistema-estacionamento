@@ -2,9 +2,11 @@ package com.estacionamento.controllers;
 
 import com.estacionamento.DTO.VeiculoDto;
 import com.estacionamento.DTO.VeiculoSaidaDto;
+import com.estacionamento.DTO.VeiculoUpdateDto;
 import com.estacionamento.domain.Veiculo;
 import com.estacionamento.services.VeiculoService;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -50,9 +52,23 @@ public class VeiculoController {
     }
 
     @GetMapping("/registros-por-veiculo/{placa}")
-    public ResponseEntity<List<VeiculoDto>> listarRegistrosDeUmVeiculo(@PathVariable String placa){
+    public ResponseEntity<List<VeiculoDto>> listarRegistrosDeUmVeiculo(@PathVariable String placa) {
         List<VeiculoDto> veiculoRegistros = this.veiculoService.listarRegistrosDeUmVeiculo(placa);
 
         return ResponseEntity.ok(veiculoRegistros);
+    }
+
+    @DeleteMapping("/excluir/{id}")
+    public ResponseEntity excluirVeiculoPeloId(@PathVariable UUID id) {
+        this.veiculoService.excluirVeiculo(id);
+
+        return ResponseEntity.status(204).build();
+    }
+
+    @PutMapping("/atualizar/{id}")
+    public ResponseEntity<VeiculoDto> atualizarVeiculoPeloId(@PathVariable UUID id, @RequestBody VeiculoUpdateDto veiculoUpdateDto){
+        VeiculoDto veiculoAtualizado = this.veiculoService.atualizarVeiculo(id, veiculoUpdateDto);
+
+        return ResponseEntity.ok(veiculoAtualizado);
     }
 }
